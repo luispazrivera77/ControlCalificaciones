@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Calificaciones by LPaz</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a365d">
+<style>
+  * { box-sizing: border-box; }
+  
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+    color: #f8fafc; 
+    margin: 0; 
+    min-height: 100vh;
+  }
+  
+  header { 
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); 
+    padding: 1.5rem; 
+    text-align: center; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1 { 
+    margin: 0; 
+    font-size: 2rem; 
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .subtitle {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 300;
+  }
+  
+  .container { 
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem; 
+  }
+  
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    background: rgba(30, 41, 59, 0.5);
+    padding: 1.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }
+  
+  .search-container {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #cbd5e1;
+  }
+  
+  input, select { 
+    width: 100%;
+    padding: 0.75rem; 
+    border: 2px solid #475569; 
+    border-radius: 8px; 
+    background: #1e293b; 
+    color: #f8fafc; 
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  input:focus, select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  input.error {
+    border-color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+  
+  button { 
+    padding: 0.75rem 1.5rem; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  
+  button:active {
+    transform: translateY(0);
+  }
+  
+  button.primary { 
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+    color: #fff; 
+  }
+  
+  button.success { 
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+    color: #fff; 
+  }
+  
+  button.danger { 
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); 
+    color: #fff; 
+  }
+  
+  button.secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: #fff;
+  }
+  
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  .table-container {
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+  }
+  
+  table { 
+    width: 100%; 
+    border-collapse: collapse; 
+  }
+  
+  th, td { 
+    border: 1px solid #475569; 
+    padding: 0.75rem; 
+    text-align: center;
+    position: relative;
+  }
+  
+  th { 
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); 
+    font-weight: 600;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  tbody tr:hover { 
+    background: rgba(59, 130, 246, 0.1); 
+  }
+  
+  tbody tr:nth-child(even) { 
+    background: rgba(30, 41, 59, 0.3); 
+  }
+  
+  .student-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #475569;
+    background: transparent;
+    color: #f8fafc;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  .grade-input {
+    width: 80px;
+  }
+  
+  .name-input {
+    width: 150px;
+    text-align: left;
+  }
+  
+  .average-cell {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #fff !important;
+    font-weight: 600;
+  }
+  
+  .delete-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+  }
+  
+  .delete-btn:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+  }
+  
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  
+  .notification.show {
+    transform: translateX(0);
+  }
+  
+  .notification.success {
+    background: #10b981;
+  }
+  
+  .notification.error {
+    background: #ef4444;
+  }
+  
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background: rgba(30, 41, 59, 0.5);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3b82f6;
+  }
+  
+  .stat-label {
+    color: #cbd5e1;
+    margin-top: 0.5rem;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #64748b;
+  }
+  
+  .empty-state h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+    
+    .controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search-container {
+      min-width: auto;
+    }
+    
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    table {
+      font-size: 0.9rem;
+    }
+    
+    .student-input {
+      padding: 0.4rem;
+    }
+    
+    .grade-input {
+      width: 70px;
+    }
+    
+    .name-input {
+      width: 120px;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 Registro de Calificaciones</h1>
+  <p class="subtitle">by LPaz - Sistema de Gestión Académica</p>
+</header>
+
+<div class="container">
+  <div class="stats" id="statsContainer">
+    <div class="stat-card">
+      <div class="stat-number" id="totalStudents">0</div>
+      <div class="stat-label">Estudiantes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="totalSubjects">0</div>
+      <div class="stat-label">Materias</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="avgGrade">-</div>
+      <div class="stat-label">Promedio General</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="search-container">
+      <label for="search">🔍 Buscar estudiante</label>
+      <input type="text" id="search" placeholder="Escriba el nombre del estudiante...">
+    </div>
+    <button class="primary" id="addStudent">
+      <span>👤</span> Agregar Estudiante
+    </button>
+    <button class="secondary" id="configCols">
+      <span>⚙️</span> Configurar Materias
+    </button>
+    <button class="success" id="exportData">
+      <span>📊</span> Exportar Datos
+    </button>
+    <button class="danger" id="importData">
+      <span>📁</span> Importar Datos
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table id="gradesTable">
+      <thead><tr id="headerRow"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    
+    <div class="empty-state" id="emptyState" style="display: none;">
+      <h3>📚 Sin estudiantes registrados</h3>
+      <p>Comience agregando su primer estudiante haciendo clic en "Agregar Estudiante"</p>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".json,.csv" style="display: none;">
+
+<script>
+class GradesRegistry {
+  constructor() {
+    this.MAX_STUDENTS = 100;
+    this.MIN_GRADE = 0;
+    this.MAX_GRADE = 20;
+    
+    this.loadData();
+    this.initializeElements();
+    this.bindEvents();
+    this.render();
+  }
+
+  loadData() {
+    this.columns = JSON.parse(localStorage.getItem('grades_columns') || '[]');
+    if (this.columns.length === 0) {
+      this.columns = ['Nombre', 'Matemáticas', 'Lenguaje', 'Ciencias', 'Historia', 'Inglés'];
+    }
+    
+    this.students = JSON.parse(localStorage.getItem('grades_students') || '[]');
+    this.originalStudents = [...this.students]; // Para búsquedas
+  }
+
+  initializeElements() {
+    this.headerRow = document.getElementById('headerRow');
+    this.tableBody = document.getElementById('tableBody');
+    this.searchInput = document.getElementById('search');
+    this.emptyState = document.getElementById('emptyState');
+    this.fileInput = document.getElementById('fileInput');
+    
+    // Stats elements
+    this.totalStudentsEl = document.getElementById('totalStudents');
+    this.totalSubjectsEl = document.getElementById('totalSubjects');
+    this.avgGradeEl = document.getElementById('avgGrade');
+  }
+
+  bindEvents() {
+    document.getElementById('addStudent').addEventListener('click', () => this.addStudent());
+    document.getElementById('configCols').addEventListener('click', () => this.configureColumns());
+    document.getElementById('exportData').addEventListener('click', () => this.exportData());
+    document.getElementById('importData').addEventListener('click', () => this.importData());
+    
+    this.searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+    this.fileInput.addEventListener('change', (e) => this.handleFileImport(e));
+  }
+
+  saveData() {
+    localStorage.setItem('grades_students', JSON.stringify(this.students));
+    localStorage.setItem('grades_columns', JSON.stringify(this.columns));
+    this.showNotification('Datos guardados correctamente', 'success');
+  }
+
+  addStudent() {
+    if (this.students.length >= this.MAX_STUDENTS) {
+      this.showNotification(`Máximo de ${this.MAX_STUDENTS} estudiantes alcanzado`, 'error');
+      return;
+    }
+
+    const newStudent = {};
+    this.columns.forEach(col => {
+      newStudent[col] = col === 'Nombre' ? `Estudiante ${this.students.length + 1}` : '';
+    });
+    
+    this.students.push(newStudent);
+    this.originalStudents = [...this.students];
+    this.saveData();
+    this.render();
+  }
+
+  deleteStudent(index) {
+    if (confirm('¿Está seguro de eliminar este estudiante? Esta acción no se puede deshacer.')) {
+      this.students.splice(index, 1);
+      this.originalStudents = [...this.students];
+      this.saveData();
+      this.render();
+    }
+  }
+
+  configureColumns() {
+    const currentCols = this.columns.filter(col => col !== 'Nombre').join(', ');
+    const newCols = prompt(
+      'Configure las materias (separadas por comas):\n\nNota: La columna "Nombre" siempre estará presente.',
+      currentCols
+    );
+    
+    if (newCols === null) return;
+    
+    const subjects = newCols.split(',')
+      .map(col => col.trim())
+      .filter(col => col && col.toLowerCase() !== 'nombre');
+    
+    if (subjects.length === 0) {
+      this.showNotification('Debe agregar al menos una materia', 'error');
+      return;
+    }
+
+    if (!confirm('¿Cambiar las materias? Esto puede afectar los datos existentes de los estudiantes.')) {
+      return;
+    }
+
+    this.columns = ['Nombre', ...subjects, 'Promedio'];
+    
+    // Actualizar estudiantes existentes
+    this.students = this.students.map(student => {
+      const updated = {};
+      this.columns.forEach(col => {
+        updated[col] = student[col] || (col === 'Promedio' ? '' : '');
+      });
+      return updated;
+    });
+    
+    this.originalStudents = [...this.students];
+    this.saveData();
+    this.render();
+  }
+
+  validateGrade(value) {
+    if (value === '') return true;
+    const num = parseFloat(value);
+    return !isNaN(num) && num >= this.MIN_GRADE && num <= this.MAX_GRADE;
+  }
+
+  calculateAverage(student) {
+    const gradeColumns = this.columns.filter(col => col !== 'Nombre' && col !== 'Promedio');
+    const grades = gradeColumns
+      .map(col => parseFloat(student[col]))
+      .filter(grade => !isNaN(grade));
+    
+    if (grades.length === 0) return '';
+    
+    const average = grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
+    return average.toFixed(1);
+  }
+
+  createStudentRow(student, index) {
+    const tr = document.createElement('tr');
+    
+    this.columns.forEach((col, colIndex) => {
+      const td = document.createElement('td');
+      
+      if (col === 'Promedio') {
+        td.className = 'average-cell';
+        td.textContent = this.calculateAverage(student);
+      } else {
+        const input = document.createElement('input');
+        input.className = `student-input ${col === 'Nombre' ? 'name-input' : 'grade-input'}`;
+        input.value = student[col] || '';
+        input.placeholder = col === 'Nombre' ? 'Nombre del estudiante' : '0-20';
+        
+        input.addEventListener('input', (e) => {
+          const value = e.target.value;
+          
+          if (col !== 'Nombre' && !this.validateGrade(value)) {
+            input.classList.add('error');
+            return;
+          }
+          
+          input.classList.remove('error');
+          student[col] = value;
+          
+          // Actualizar promedio en tiempo real
+          if (col !== 'Nombre') {
+            const avgCell = tr.querySelector('.average-cell');
+            if (avgCell) {
+              avgCell.textContent = this.calculateAverage(student);
+            }
+          }
+          
+          this.saveData();
+          this.updateStats();
+        });
+        
+        input.addEventListener('blur', () => {
+          if (col !== 'Nombre' && input.value && !this.validateGrade(input.value)) {
+            this.showNotification(`La nota debe estar entre ${this.MIN_GRADE} y ${this.MAX_GRADE}`, 'error');
+            input.focus();
+          }
+        });
+        
+        td.appendChild(input);
+      }
+      
+      tr.appendChild(td);
+    });
+    
+    // Columna de acciones
+    const actionTd = document.createElement('td');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '🗑️';
+    deleteBtn.title = 'Eliminar estudiante';
+    deleteBtn.addEventListener('click', () => this.deleteStudent(index));
+    actionTd.appendChild(deleteBtn);
+    tr.appendChild(actionTd);
+    
+    return tr;
+  }
+
+  handleSearch(term) {
+    if (!term.trim()) {
+      this.students = [...this.originalStudents];
+    } else {
+      const searchTerm = term.toLowerCase();
+      this.students = this.originalStudents.filter(student =>
+        Object.values(student).some(val => 
+          (val || '').toString().toLowerCase().includes(searchTerm)
+        )
+      );
+    }
+    this.render();
+  }
+
+  updateStats() {
+    const totalStudents = this.originalStudents.length;
+    const totalSubjects = this.columns.length - 2; // Excluir Nombre y Promedio
+    
+    // Calcular promedio general
+    let totalGrades = 0;
+    let gradeCount = 0;
+    
+    this.originalStudents.forEach(student => {
+      const gradeColumns = this.columns.filter(col => col !== 'Nombre' && col !== 'Promedio');
+      gradeColumns.forEach(col => {
+        const grade = parseFloat(student[col]);
+        if (!isNaN(grade)) {
+          totalGrades += grade;
+          gradeCount++;
+        }
+      });
+    });
+    
+    this.totalStudentsEl.textContent = totalStudents;
+    this.totalSubjectsEl.textContent = Math.max(0, totalSubjects);
+    this.avgGradeEl.textContent = gradeCount > 0 ? (totalGrades / gradeCount).toFixed(1) : '-';
+  }
+
+  render() {
+    // Actualizar estadísticas
+    this.updateStats();
+    
+    // Renderizar encabezados
+    this.headerRow.innerHTML = '';
+    [...this.columns, 'Acciones'].forEach(col => {
+      const th = document.createElement('th');
+      th.textContent = col;
+      this.headerRow.appendChild(th);
+    });
+    
+    // Renderizar filas
+    this.tableBody.innerHTML = '';
+    
+    if (this.students.length === 0) {
+      this.emptyState.style.display = 'block';
+      document.querySelector('.table-container table').style.display = 'none';
+    } else {
+      this.emptyState.style.display = 'none';
+      document.querySelector('.table-container table').style.display = 'table';
+      
+      this.students.forEach((student, index) => {
+        const originalIndex = this.originalStudents.indexOf(student);
+        const row = this.createStudentRow(student, originalIndex);
+        this.tableBody.appendChild(row);
+      });
+    }
+  }
+
+  exportData() {
+    const data = {
+      columns: this.columns,
+      students: this.students,
+      exportDate: new Date().toISOString(),
+      appName: 'Registro de Calificaciones by LPaz'
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `calificaciones_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    this.showNotification('Datos exportados correctamente', 'success');
+  }
+
+  importData() {
+    this.fileInput.click();
+  }
+
+  handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        
+        if (!data.columns || !data.students || !Array.isArray(data.columns) || !Array.isArray(data.students)) {
+          throw new Error('Formato de archivo inválido');
+        }
+        
+        if (!confirm('¿Importar datos? Esto reemplazará todos los datos actuales.')) {
+          return;
+        }
+        
+        this.columns = data.columns;
+        this.students = data.students;
+        this.originalStudents = [...this.students];
+        
+        this.saveData();
+        this.render();
+        this.showNotification('Datos importados correctamente', 'success');
+        
+      } catch (error) {
+        this.showNotification('Error al importar: Archivo inválido', 'error');
+      }
+    };
+    
+    reader.readAsText(file);
+    event.target.value = ''; // Reset file input
+  }
+
+  showNotification(message, type = 'success') {
+    // Remove existing notifications
+    document.querySelectorAll('.notification').forEach(n => n.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Hide notification
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+}
+
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new GradesRegistry();
+});
+
+// Service Worker registration
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js")
+    .then(() => console.log("Service Worker registrado correctamente"))
+    .catch(err => console.error("Error al registrar Service Worker:", err));
+}
+</script>
+</body>
+</html>
